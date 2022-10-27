@@ -26,10 +26,9 @@ for record in data:
     session.add(model(id=record.get('pk'), **record.get('fields')))
 session.commit()
 
-publisher_id = input('Введите id издателя')
-q = session.query(Publisher).join(Book.publisher).filter(Publisher.id == publisher_id)
-print(q)
-for s in q.all():
-    print(s.id, s.name)
-    for hw in s.book:
-        print("\t", hw.id, hw.title, hw.id_publisher)
+publisher_id = input('Введите id издателя ')
+
+print("\nМагазины выбранного издателя: ")
+subq = session.query(Book).join(Publisher.books).filter(Publisher.id == publisher_id).subquery()
+for c in session.query(Shop).join(Stock).join(subq, Stock.id_book == subq.c.id).all():
+    print(c)
